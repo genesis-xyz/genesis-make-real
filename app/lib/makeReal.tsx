@@ -1,12 +1,12 @@
 import { Editor, TLShapeId, createShapeId } from '@tldraw/tldraw'
-import { ResponseShape } from './ResponseShape/ResponseShape'
-import { getSelectionAsImageDataUrl } from './lib/getSelectionAsImageDataUrl'
+import { ResponseShape } from '../ResponseShape/ResponseShape'
+import { getSelectionAsImageDataUrl } from './getSelectionAsImageDataUrl'
 import {
 	GPT4VCompletionResponse,
 	GPT4VMessage,
 	MessageContent,
 	fetchFromOpenAi,
-} from './lib/fetchFromOpenAi'
+} from './fetchFromOpenAi'
 
 // the system prompt explains to gpt-4 what we want it to do and how it should behave.
 const systemPrompt = `You are an expert web developer who specializes in building working website prototypes from low-fidelity wireframes.
@@ -36,12 +36,11 @@ You love your designers and want them to be happy. Incorporating their feedback 
 
 When sent new wireframes, respond ONLY with the contents of the html file.`
 
-export async function makeReal(editor: Editor) {
+export async function makeReal(editor: Editor, baseURL?: string, apiKey?: string) {
 	// we can't make anything real if there's nothing selected
 	const selectedShapes = editor.getSelectedShapes()
-	if (selectedShapes.length === 0) {
-		throw new Error('First select something to make real.')
-	}
+	
+	if (selectedShapes.length === 0) throw Error('First select something to make real.')
 
 	// first, we build the prompt that we'll send to openai.
 	const prompt = await buildPromptForOpenAi(editor)
@@ -51,16 +50,7 @@ export async function makeReal(editor: Editor) {
 	const responseShapeId = makeEmptyResponseShape(editor)
 
 	try {
-		// If you're using the API key input, we preference the key from there.
-		// It's okay if this is undefined—it will just mean that we'll use the
-		// one in the .env file instead.
-		const apiKeyFromDangerousApiKeyInput = (
-			document.body.querySelector('#openai_key_risky_but_cool') as HTMLInputElement
-		)?.value
-
-		// make a request to openai. `fetchFromOpenAi` is a next.js server action,
-		// so our api key is hidden.
-		const openAiResponse = await fetchFromOpenAi(apiKeyFromDangerousApiKeyInput, {
+		const openAiResponse = await fetchFromOpenAi(baseURL, apiKey, {
 			model: 'gpt-4-vision-preview',
 			max_tokens: 4096,
 			temperature: 0,

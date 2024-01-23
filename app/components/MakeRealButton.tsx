@@ -1,14 +1,17 @@
 import { useEditor, useToasts } from '@tldraw/tldraw'
 import { useCallback } from 'react'
-import { makeReal } from '../makeReal'
+import { makeReal } from '../lib/makeReal'
+import { getOpenAIAPI } from '../lib/signInWithAI'
 
 export function MakeRealButton() {
 	const editor = useEditor()
 	const { addToast } = useToasts()
 
 	const handleClick = useCallback(async () => {
+		const { baseURL, apiKey } = getOpenAIAPI()
+
 		try {
-			await makeReal(editor)
+			await makeReal(editor, baseURL!, apiKey!)
 		} catch (e) {
 			console.error(e)
 			addToast({
