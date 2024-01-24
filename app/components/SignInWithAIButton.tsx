@@ -47,7 +47,7 @@ export function SignInWithAIButton() {
 				<a
 					className="question__button"
 					target="_blank"
-					href="https://tldraw.notion.site/Make-Real-FAQs-93be8b5273d14f7386e14eb142575e6e?pvs=4"
+					href="https://github.com/genesis-xyz/ai/tree/main#faq"
 				>
 					<Icon icon="question" />
 				</a>
